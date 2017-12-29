@@ -10,10 +10,10 @@ import java.io.IOException;
 /**
  * Created by huyanxia on 2017/8/10.
  */
-//@WebServlet(name = "RegisterUIServlet",value="/servlet/RegisterUIServlet")
+@WebServlet(name = "RegisterUIServlet",value="/servlet/RegisterUIServlet")
 public class RegisterUIServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("classpath:pages/register.jsp").forward(request,response);
+        request.getRequestDispatcher("/WEB-INF/classes/pages/register.jsp").forward(request,response);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
