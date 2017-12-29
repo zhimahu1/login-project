@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.jd.login</groupId>
+        <artifactId>login-project</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>login-web</artifactId>
+    <packaging>war</packaging>
+    <version>4.0.1-SNAPSHOT</version>
+    <name>login-web</name>
+
+    <properties>
+        <springframework.version>4.0.0.RELEASE</springframework.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.jd.login</groupId>
+            <artifactId>login-exception</artifactId>
+            <version>4.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jd.login</groupId>
+            <artifactId>login-service</artifactId>
+            <version>4.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jd.login</groupId>
+            <artifactId>login-util</artifactId>
+            <version>4.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jd.login</groupId>
+            <artifactId>login-domain</artifactId>
+            <version>4.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <!--提供了框架的基础部分，包括反转控制和依赖注入。其中Bean Factory是容器核心-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <!--以Core和Beans为基础，集成Beans模块功能并添加资源绑定、数据验证、国际化、
+        Java EE支持、容器生命周期、事件传播等；核心接口是ApplicationContext-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+        <!--velocity-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+    </dependencies>
+</project>
