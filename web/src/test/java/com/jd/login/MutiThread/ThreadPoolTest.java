@@ -1,6 +1,6 @@
 package com.jd.login.MutiThread;
 
-import com.alibaba.dubbo.common.json.JSON;
+import com.alibaba.fastjson.JSON;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -23,17 +23,22 @@ public class ThreadPoolTest {
     }
     public void testExecutorServiceException() throws Exception{
         Boolean flag = true;
+        //线程池，一个线程，线程池内部的任务是异步串行执行
         ExecutorService executorService = Executors.newSingleThreadExecutor();
+        //results中存放任务执行的结果
         List<Future<Boolean>> results = new ArrayList<Future<Boolean>>(10);
+
         try{
             for(int i=0; i<10; i++){
                 Future<Boolean> future = executorService.submit(new ActSKUCacheCallable(i, flag));
-                if(false == future.get()){
+               /* if(false == future.get()){
                     //throw new Exception("4324");
-                    return;
-                }
-                // results.add(future);
+                    //return;
+                }*/
+                //收集任务执行的结果，存储在results中
+                results.add(future);
             }
+            //主线程中执行，所以flag的值不一定是异步任务处理后的结果
             System.out.println("结果:" + flag);
             for(int i=0; i<10; i++){
                 boolean flag1 = results.get(i).get();
@@ -46,6 +51,22 @@ public class ThreadPoolTest {
         }
     }
 
+    private void testCompletionService(){
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        BlockingQueue<Boolean> booleanBlockingQueue = new LinkedBlockingQueue<Boolean>();
+        CompletionService completionService = new ExecutorCompletionService(executorService, booleanBlockingQueue);
+        boolean flag = true;
+        for(int i=0; i<10; i++){
+            completionService.submit(new ActSKUCacheCallable(i, flag));
+        }
+        try{
+            Future<Boolean> future = completionService.take();
+        }catch(Exception e){
+            e.printStackTrace();
+
+        }
+    }
+
     private class ActSKUCacheCallable implements Callable<Boolean> {
         int i;
         Boolean flag;
@@ -55,89 +76,41 @@ public class ThreadPoolTest {
         }
         public Boolean call() throws Exception {
             try {
-                if(i % 2 != 0){
-                    throw new Exception("try");
-                }
-                System.out.println("正常执行");
+                i++;
+                //这里抛出异常会通过future.get获得
+                throw new Exception("异常");
             } catch (Exception e) {
                 System.out.println("catch");
                 //flag = false;
-                //throw e;
-                return Boolean.FALSE;
+                //抛出异常不影响线程池中其他任务的执行
+                throw e;
+                //return Boolean.FALSE;
             } finally {
                 System.out.println("finally 代码块" + flag);
             }
 
+            //System.out.println("try代码块外面");
+            //return Boolean.TRUE ;
+        }
+    }
+    private class SumCallable implements Callable<Integer> {
+        int i;
+        Integer result;
+        SumCallable(int i){
+            this.i = i;
+            this.result = result;
+        }
+        public Integer call() throws Exception {
+            try {
+                result += i;
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                System.out.println("finally 代码块" + result);
+            }
+
             System.out.println("try代码块外面");
-            return Boolean.TRUE;
-        }
-    }
-    BlockingQueue<Activity> queue = new ArrayBlockingQueue<Activity>(1 );
-    private static final ExecutorService EXECUTE_EXECUTOR = Executors.newSingleThreadExecutor();
-
-    @Test
-    public void testQueue(){
-        try{
-            for(int i = 0 ; i<7 ; i++){
-                int actId = 2951+i;
-                Activity message = promotionRepository.selectActivity(actId);
-                onMessage(message);
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-            System.out.println("fa");
-        }
-
-    }
-
-    public void onMessage(Activity message){
-
-        try{
-            //LOGGER.info("actCreateMessage: {}", message);
-            System.out.println("即将加入队列中的：" + JSON.toJSONString(message));
-
-            queue.put(message);
-            System.out.println("队列中的：" + JSON.toJSONString(queue));
-            EXECUTE_EXECUTOR.submit(new ActicitySKUCache(queue));
-        }catch(Exception e){
-            //LOGGER.info("process actCreateMessage has exception, {}", e);
-            throw new RuntimeException("process actCreateMessage has exception");
-        }
-    }
-
-    private class ActicitySKUCache implements Runnable{
-        private BlockingQueue<Activity> queue;
-
-        public ActicitySKUCache(BlockingQueue queue){
-            this.queue = queue;
-        }
-        public void run() {
-            int  num=0;
-            while(!queue.isEmpty()){
-                System.out.println("异步队列中：" + JSON.toJSONString(queue));
-                Activity message = new Activity();
-
-                try{
-                    message = queue.take();
-
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-
-                System.out.println("异步队列中要处理的：" + JSON.toJSONString(message));
-
-                //String text = message.getText();
-                //LOGGER.info("actCreateMessage, topic:{}, text:{}", message.getTopic(), text);
-                //Activity activity = JSONObject.parseObject(text, Activity.class);
-                for(int i = 0; i<10000;i++){
-                    num++;
-                    System.out.println("消息：" + message.getActivityId() + ", 第" + i + "次" + num + "Thread: " + Thread.currentThread().getName());
-
-                }
-                queue.remove(message);
-                System.out.println("异步队列中处理后的：" + JSON.toJSONString(queue));
-
-            }
+            return result;
         }
     }
 }
